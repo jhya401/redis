@@ -34,15 +34,15 @@ public class RedisTest implements ApplicationRunner {
     }
 
     private void tryLock() throws InterruptedException {
-        RAtomicLong beforeValue = allocationRedissonClient.getAtomicLong("test:key");
-        beforeValue.set(0L);
+        //RAtomicLong beforeValue = allocationRedissonClient.getAtomicLong("test:key");
+        //beforeValue.set(0L);
 
         RLock lock = allocationRedissonClient.getLock("test:lock:key");
         try {
-            for (int i=0; i<1000; i++) {
+            for (int i=0; i<100000; i++) {
                 // waitTime: Lock 을 차지하기 위해 기다리는 시간
                 // leaseTime: Lock 차지 후 점유하고 있을 최대 시간(만약 내부 로직이 leaseTime 보다 빨리 끝나면 끝나자마자 Lock 을 반납한다
-                if (lock.tryLock(10, 2, TimeUnit.SECONDS)) {
+                if (lock.tryLock(1, 2, TimeUnit.SECONDS)) {
                     //System.out.println("Start");
                     //Thread.sleep(1000 * 25);
                     //System.out.println("Success");
