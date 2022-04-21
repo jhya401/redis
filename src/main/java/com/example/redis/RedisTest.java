@@ -56,6 +56,31 @@ public class RedisTest implements ApplicationRunner {
         }
     }
 
+    /**
+     * leaseTime 이 초과된 후 unlock() 실행 시 -> IllegalStateException 예외발생한다.
+     * 해결방법: isHeldByCurrentThread() 체크 후 unlock() 을 실행한다.
+     */
+    private void overTimeLogicAndThrowIllegalStateException() {
+        RLock lock = allocationRedissonClient.getLock("test:lock:key01");
+        try {
+            if (lock.tryLock(1, 35, TimeUnit.SECONDS)) {
+                Thread.sleep(1000 * 30);
+                RAtomicLong value = allocationRedissonClient.getAtomicLong("test:key01");
+                value.getAndIncrement();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            // ✅ isHeldByCurrentThread() 체크 후 unlock() 을 실행한다.
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+
+
+
     private void getAndSetRedis() {
 
         RBucket<Object> bucket = allocationRedissonClient.getBucket("test:key", new StringCodec());
