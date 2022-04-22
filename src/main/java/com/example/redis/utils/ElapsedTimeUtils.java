@@ -1,4 +1,4 @@
-package com.example.redis;
+package com.example.redis.utils;
 
 import java.text.NumberFormat;
 import java.time.Duration;
